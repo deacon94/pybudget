@@ -35,9 +35,14 @@ class Category:
         # Not enough funds
         return False
 
-    def transfer(self, amount, dest_category):
-        
+    def transfer(source_category, amount, dest_category):
+        # Initiate transfer
+        if source_category.withdraw(amount, 'Transfer to ' + dest_category.type):
+            # Only deposit if withdraw was successful           
+            dest_category.deposit(amount, 'Transfer from ' + source_category.type)
+            return True
 
+        return False
 
     def get_balance(self):
         return self.category_amount
