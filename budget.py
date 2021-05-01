@@ -2,13 +2,13 @@ class Category:
 
     def __init__(self, type):
         self.type = type
-        self.category_amount = 0
+        self.category_amount = 0.00
         self.ledger = list()
 
     def deposit(self, amount, description=''):
         if (amount > 0):
             # Add amount to category_amount (for easy calculations)
-            self.category_amount = self.category_amount + amount 
+            self.category_amount = self.category_amount + amount
 
             # Adjust ledger
             self.ledger.append({'amount': amount, 'description': description})
@@ -47,5 +47,24 @@ class Category:
     def get_balance(self):
         return self.category_amount
 
+    def __str__(self):
+        # Category Name
+        string_output = self.type.center(30, '*') + '\n'
+
+        # Ledger Items
+        for ledger_entry in self.ledger:
+            # Item description
+            next_line = ledger_entry.get('description')[:23].ljust(23)
+
+            # Item amount
+            next_line = next_line + str(format(ledger_entry.get('amount'), '.2f')).rjust(7) + '\n'
+
+            string_output = string_output + next_line
+    
+        # Category Total
+        string_output = string_output + 'Total: ' + str(self.get_balance())
+
+        return string_output
+        
 def create_spend_chart(categories):
     return 'TO DO'
