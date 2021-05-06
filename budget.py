@@ -47,6 +47,18 @@ class Category:
     def get_balance(self):
         return self.category_amount
 
+    def percentage_spent(self):
+        total_withdraw = 0
+
+        # Loop through the ledger to determine +/-
+        for item in self.ledger:
+            if item.get('amount') > 0:
+                total_deposit += item.get('amount')
+            else:
+                total_withdraw += (item.get('amount') * -1)
+
+        return round((total_withdraw / total_deposit)*10) * 10
+
     def __str__(self):
         # Category Name
         string_output = self.type.center(30, '*') + '\n'
@@ -67,4 +79,44 @@ class Category:
         return string_output
         
 def create_spend_chart(categories):
-    return 'TO DO'
+    return_chart = 'Percentage spent by category\n'
+
+    # Loop by 
+    for i in range(100, -1, -10):
+        next_line = str(i).rjust(3) + '|'
+
+        for cat in categories:
+            if i <= cat.percentage_spent():
+                # Add to current line
+                next_line = next_line + ' o ' 
+            else:
+                next_line = next_line + '   '
+
+        # Add latest line to return string
+        return_chart = return_chart + next_line + '\n'
+
+    return_chart = return_chart + '    ' + str('-').center(((len(categories)*3)), '-') + '-\n'
+
+    # Loop through each category name
+    max_height = 0
+    i = 0
+
+    # Figure out the longest category name
+    for cat in categories:
+        max_height = max(max_height, len(cat.type))
+
+    # Loop by longest (vertically), then across by category
+    for i in range(0, max_height):
+        next_line = '    '
+
+        for cat in categories:
+            if i < len(cat.type):
+                # Add to current line
+                next_line = next_line + ' ' + cat.type[i] + ' '
+            else:
+                next_line = next_line + '   '
+
+        # Add latest line to return string
+        return_chart = return_chart + next_line + ' \n'
+
+    return return_chart
