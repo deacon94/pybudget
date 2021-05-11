@@ -3,6 +3,7 @@ class Category:
     def __init__(self, type):
         self.type = type
         self.category_amount = 0.00
+        self.total_withdraw = 0.00
         self.ledger = list()
 
     def deposit(self, amount, description=''):
@@ -25,6 +26,7 @@ class Category:
         if (amount > 0) and (self.check_funds(amount)):
             # Subtract amount to category_amount (for easy calculations)
             self.category_amount = self.category_amount - amount 
+            self.total_withdraw += amount
 
             # Adjust ledger
             neg_amount = amount * -1
@@ -47,18 +49,6 @@ class Category:
     def get_balance(self):
         return self.category_amount
 
-    def percentage_spent(self):
-        total_withdraw = 0
-
-        # Loop through the ledger to determine +/-
-        for item in self.ledger:
-            if item.get('amount') > 0:
-                total_deposit += item.get('amount')
-            else:
-                total_withdraw += (item.get('amount') * -1)
-
-        return round((total_withdraw / total_deposit)*10) * 10
-
     def __str__(self):
         # Category Name
         string_output = self.type.center(30, '*') + '\n'
@@ -77,23 +67,29 @@ class Category:
         string_output = string_output + 'Total: ' + str(self.get_balance())
 
         return string_output
-        
+           
 def create_spend_chart(categories):
+    total = 0
+
     return_chart = 'Percentage spent by category\n'
+
+    # Compute total
+    for cat in categories:
+        total += cat.total_withdraw
 
     # Loop by 
     for i in range(100, -1, -10):
         next_line = str(i).rjust(3) + '|'
 
         for cat in categories:
-            if i <= cat.percentage_spent():
+            if i <= ((cat.total_withdraw/total)*100) - (((cat.total_withdraw/total)*100)%10):
                 # Add to current line
                 next_line = next_line + ' o ' 
             else:
                 next_line = next_line + '   '
 
         # Add latest line to return string
-        return_chart = return_chart + next_line + '\n'
+        return_chart = return_chart + next_line + ' \n'
 
     return_chart = return_chart + '    ' + str('-').center(((len(categories)*3)), '-') + '-\n'
 
@@ -117,6 +113,9 @@ def create_spend_chart(categories):
                 next_line = next_line + '   '
 
         # Add latest line to return string
-        return_chart = return_chart + next_line + ' \n'
+        if i < max_height - 1:
+            return_chart = return_chart + next_line + ' \n'
+        else:    
+            return_chart = return_chart + next_line + ' '
 
     return return_chart
